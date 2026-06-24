@@ -1,17 +1,15 @@
 const CHANNEL = {
-  name: "LoungeMusic",
+  name: "Lounge Musiq",
   handle: "@loungemusiq",
   channelUrl: "https://www.youtube.com/@loungemusiq",
 
-  // Recommended simple live option:
-  // 1) Find your YouTube Channel ID. It usually starts with "UC".
-  // 2) Convert it to your Uploads Playlist ID by replacing "UC" with "UU".
+  // Simple live option:
+  // YouTube Channel ID starts with UC. The uploads playlist starts with UU.
   // Example: UCabc123 -> UUabc123
   uploadsPlaylistId: "",
 
-  // Advanced live card option:
+  // Advanced live cards option:
   // Add a restricted YouTube Data API v3 browser key and the Channel ID.
-  // Restrict the key in Google Cloud to your GitHub Pages domain.
   youtubeApiKey: "",
   youtubeChannelId: "",
 
@@ -26,16 +24,86 @@ const featuredVideo = $('#featuredVideo');
 const videoGrid = $('#videoGrid');
 const videoEmpty = $('#videoEmpty');
 const year = $('#year');
-const header = $('[data-scroll-header]');
+const header = $('[data-header]');
+const cursorGlow = $('[data-cursor-glow]');
+const heroBg = $('.hero-bg');
+const moodTitle = $('[data-now-title]');
+const moodCopy = $('[data-now-copy]');
 
 year.textContent = new Date().getFullYear();
-channelLinks.forEach((link) => {
-  link.href = CHANNEL.channelUrl;
-});
+channelLinks.forEach((link) => { link.href = CHANNEL.channelUrl; });
+
+const moodContent = {
+  sunset: {
+    title: 'Sunset Lounge Session',
+    copy: 'Warm keys, soft percussion, deep bass and smooth ocean-night atmosphere.'
+  },
+  night: {
+    title: 'Dubai Night Chill',
+    copy: 'A darker late-night mood with elegant bass, skyline ambience and premium hotel-lounge energy.'
+  },
+  focus: {
+    title: 'Luxury Focus Flow',
+    copy: 'Minimal distraction, soft rhythmic motion and calm background energy for work and reading.'
+  }
+};
 
 window.addEventListener('scroll', () => {
-  header.classList.toggle('is-scrolled', window.scrollY > 10);
+  const y = window.scrollY;
+  header.classList.toggle('is-scrolled', y > 18);
+  if (heroBg) heroBg.style.transform = `scale(1.035) translateY(${Math.min(y * 0.08, 42)}px)`;
 }, { passive: true });
+
+window.addEventListener('pointermove', (event) => {
+  if (!cursorGlow) return;
+  cursorGlow.style.left = `${event.clientX}px`;
+  cursorGlow.style.top = `${event.clientY}px`;
+}, { passive: true });
+
+$('[data-theme-toggle]')?.addEventListener('click', (event) => {
+  document.body.classList.toggle('warm-mode');
+  event.currentTarget.textContent = document.body.classList.contains('warm-mode') ? '☀' : '☾';
+});
+
+$$('[data-mood]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const mood = moodContent[button.dataset.mood];
+    if (!mood) return;
+    $$('[data-mood]').forEach((item) => item.classList.remove('is-active'));
+    button.classList.add('is-active');
+    moodTitle.textContent = mood.title;
+    moodCopy.textContent = mood.copy;
+  });
+});
+
+$$('[data-tilt-card]').forEach((card) => {
+  card.addEventListener('pointermove', (event) => {
+    const rect = card.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width;
+    const y = (event.clientY - rect.top) / rect.height;
+    const rotateX = (0.5 - y) * 7;
+    const rotateY = (x - 0.5) * 7;
+    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    card.style.setProperty('--mx', `${x * 100}%`);
+    card.style.setProperty('--my', `${y * 100}%`);
+  });
+  card.addEventListener('pointerleave', () => {
+    card.style.transform = '';
+    card.style.removeProperty('--mx');
+    card.style.removeProperty('--my');
+  });
+});
+
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('is-visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.14 });
+
+$$('.reveal').forEach((item) => revealObserver.observe(item));
 
 function formatDate(value) {
   if (!value) return 'New upload';
@@ -69,15 +137,15 @@ function renderPlaylistFallback() {
     videoEmpty.hidden = false;
     videoGrid.innerHTML = `
       <article class="video-card">
-        <div class="video-placeholder" style="min-height: 210px;">
-          <div>
-            <span>LM</span>
-            <p>Add your Uploads Playlist ID or YouTube API key.</p>
-          </div>
-        </div>
         <div class="video-card-content">
           <h3>Live YouTube area prepared</h3>
-          <p>Open script.js and enter your YouTube configuration.</p>
+          <p>Add your Uploads Playlist ID in script.js to activate the newest-video player.</p>
+        </div>
+      </article>
+      <article class="video-card">
+        <div class="video-card-content">
+          <h3>Direct channel link active</h3>
+          <p>All YouTube buttons already point to ${sanitize(CHANNEL.handle)}.</p>
         </div>
       </article>
     `;
@@ -142,9 +210,7 @@ async function fetchVideosFromYouTubeApi() {
   });
 
   const response = await fetch(`https://www.googleapis.com/youtube/v3/search?${params.toString()}`);
-  if (!response.ok) {
-    throw new Error(`YouTube API error: ${response.status}`);
-  }
+  if (!response.ok) throw new Error(`YouTube API error: ${response.status}`);
 
   const data = await response.json();
   return (data.items || [])
