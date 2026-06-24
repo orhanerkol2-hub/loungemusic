@@ -151,12 +151,27 @@ async function resolveChannelId() {
   return '';
 }
 
+function embedVideo(videoId, autoplay = false) {
+  videoIntro.hidden = true;
+  videoEmbed.hidden = false;
+  const ap = autoplay ? '&autoplay=1' : '';
+  videoEmbed.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?rel=0${ap}" title="Lounge Musiq" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+}
+
+function playVideo(videoId, card) {
+  $$('.video-card.is-playing', videoGrid).forEach((c) => c.classList.remove('is-playing'));
+  if (card) card.classList.add('is-playing');
+  embedVideo(videoId, true);
+  const section = document.getElementById('videos');
+  if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function renderVideos(xmlText) {
   const xml = new DOMParser().parseFromString(xmlText, 'text/xml');
   const entries = Array.from(xml.getElementsByTagName('entry')).slice(0, CHANNEL.maxVideos);
   if (!entries.length) throw new Error('No videos found');
 
-  const cards = entries.map((entry) => {
+  const cards = entries.map((entry, index) => {
     const idNode = entry.getElementsByTagName('yt:videoId')[0] || entry.getElementsByTagName('videoId')[0];
     const titleNode = entry.getElementsByTagName('title')[0];
     const publishedNode = entry.getElementsByTagName('published')[0];
@@ -166,7 +181,7 @@ function renderVideos(xmlText) {
     if (!id) return '';
 
     return `
-      <a class="video-card reveal is-visible" href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener" title="${esc(title)}">
+      <div class="video-card reveal is-visible${index === 0 ? ' is-playing' : ''}" data-video-id="${id}" role="button" tabindex="0" title="${esc(title)}">
         <div class="video-thumb">
           <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="${esc(title)}" loading="lazy" />
           <span class="play" aria-hidden="true">▶</span>
@@ -175,26 +190,32 @@ function renderVideos(xmlText) {
           <h3>${esc(title)}</h3>
           <p class="date">${fmtDate(published)}</p>
         </div>
-      </a>`;
+      </div>`;
   }).join('');
 
   videoGrid.hidden = false;
   videoGrid.innerHTML = cards;
 
+  $$('.video-card[data-video-id]', videoGrid).forEach((card) => {
+    card.addEventListener('click', () => playVideo(card.dataset.videoId, card));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        playVideo(card.dataset.videoId, card);
+      }
+    });
+  });
+
   const firstIdNode = entries[0].getElementsByTagName('yt:videoId')[0] || entries[0].getElementsByTagName('videoId')[0];
   const firstId = firstIdNode ? firstIdNode.textContent : '';
-  if (firstId) {
-    videoIntro.hidden = true;
-    videoEmbed.hidden = false;
-    videoEmbed.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${firstId}?rel=0&modestbranding=1" title="Lounge Musiq latest video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-  }
+  if (firstId) embedVideo(firstId);
 }
 
 function renderFallback() {
   if (CHANNEL.uploadsPlaylistId) {
     videoIntro.hidden = true;
     videoEmbed.hidden = false;
-    videoEmbed.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/videoseries?list=${CHANNEL.uploadsPlaylistId}&rel=0&modestbranding=1" title="Lounge Musiq uploads" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    videoEmbed.innerHTML = `<iframe src="https://www.youtube.com/embed/videoseries?list=${CHANNEL.uploadsPlaylistId}&rel=0" title="Lounge Musiq uploads" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
   }
 
   videoGrid.innerHTML = `
