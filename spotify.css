@@ -1,0 +1,118 @@
+.spotify-section {
+  padding: clamp(4rem, 8vw, 6.5rem) 22px;
+}
+
+.spotify-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+  gap: clamp(1.2rem, 4vw, 3rem);
+  align-items: center;
+  padding: clamp(1.4rem, 4vw, 2.8rem);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 34px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(30, 215, 96, 0.18), transparent 22rem),
+    radial-gradient(circle at 88% 82%, rgba(248, 210, 122, 0.15), transparent 24rem),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)),
+    rgba(12, 9, 6, 0.62);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.48);
+}
+
+.spotify-layout::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(30, 215, 96, 0.28), transparent 32%, rgba(248, 210, 122, 0.22) 68%, transparent);
+  opacity: 0.5;
+}
+
+.spotify-copy,
+.spotify-embed-card {
+  position: relative;
+  z-index: 1;
+}
+
+.spotify-copy h2 {
+  margin-bottom: 1rem;
+  font-size: clamp(2.1rem, 5vw, 4.4rem);
+  letter-spacing: -0.055em;
+}
+
+.spotify-copy p {
+  color: var(--muted, rgba(255, 240, 210, 0.76));
+  max-width: 540px;
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.spotify-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1.6rem;
+}
+
+.spotify-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 1.18rem;
+  border-radius: 999px;
+  color: #06100a;
+  font-weight: 900;
+  background: linear-gradient(135deg, #d8ffe4, #1ed760 55%, #109c43);
+  box-shadow: 0 16px 34px rgba(30, 215, 96, 0.22);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.spotify-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 44px rgba(30, 215, 96, 0.3);
+}
+
+.spotify-embed-card {
+  padding: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 30px;
+  background: rgba(0, 0, 0, 0.32);
+  box-shadow: inset 0 0 42px rgba(0, 0, 0, 0.28);
+}
+
+.spotify-embed-card iframe {
+  display: block;
+  border: 0;
+}
+
+@media (max-width: 980px) {
+  .spotify-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .spotify-section {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .spotify-layout {
+    padding: 1rem;
+    border-radius: 26px;
+  }
+
+  .spotify-embed-card {
+    padding: 0.45rem;
+    border-radius: 24px;
+  }
+
+  .spotify-embed-card iframe {
+    height: 352px;
+  }
+}
