@@ -20,7 +20,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <style>
-    .spotify-section{padding:clamp(4rem,8vw,6.5rem) 22px}.spotify-layout{display:grid;grid-template-columns:minmax(0,.88fr) minmax(320px,1.12fr);gap:1rem;align-items:stretch}.spotify-copy,.spotify-embed-card{border:1px solid var(--line);background:linear-gradient(145deg,rgba(255,255,255,.11),rgba(255,255,255,.035)),var(--glass);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:var(--shadow);border-radius:34px}.spotify-copy{padding:clamp(1.4rem,3vw,2.2rem);display:flex;flex-direction:column;justify-content:space-between;min-height:352px;position:relative;overflow:hidden}.spotify-copy:before{content:"";position:absolute;inset:-30%;background:radial-gradient(circle at 18% 12%,rgba(30,215,96,.22),transparent 20rem),radial-gradient(circle at 88% 88%,rgba(248,210,122,.16),transparent 22rem);pointer-events:none}.spotify-copy>*{position:relative;z-index:1}.spotify-copy h2{font-size:clamp(2.1rem,5vw,4.2rem);letter-spacing:-.055em;margin:.6rem 0 1rem}.spotify-copy p{color:var(--muted);font-size:1.05rem;max-width:560px}.spotify-actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem}.spotify-button{min-height:50px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:0 1.1rem;font-weight:900;color:#061006;background:linear-gradient(135deg,#7dff9e,#1ed760 52%,#0e9f41);box-shadow:0 16px 34px rgba(30,215,96,.18);transition:transform .16s ease,box-shadow .16s ease}.spotify-button:hover{transform:translateY(-3px);box-shadow:0 20px 42px rgba(30,215,96,.24)}.spotify-embed-card{overflow:hidden;min-height:352px}.spotify-embed-card iframe{display:block;width:100%;min-height:352px;border:0}@media(max-width:900px){.spotify-layout{grid-template-columns:1fr}}@media(max-width:720px){.spotify-actions a{width:100%}.spotify-embed-card iframe{min-height:420px}}
+    .spotify-section{padding:clamp(4rem,8vw,6.5rem) 22px}.spotify-layout{display:grid;grid-template-columns:minmax(0,.82fr) minmax(320px,1.18fr);gap:1rem;align-items:stretch}.spotify-copy,.spotify-embed-card{border:1px solid var(--line);background:linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.04)),var(--glass);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:var(--shadow);border-radius:34px}.spotify-copy{padding:clamp(1.45rem,3vw,2.35rem);display:flex;flex-direction:column;justify-content:space-between;min-height:380px;position:relative;overflow:hidden}.spotify-copy:before{content:"";position:absolute;inset:-30%;background:radial-gradient(circle at 18% 12%,rgba(30,215,96,.26),transparent 20rem),radial-gradient(circle at 88% 88%,rgba(248,210,122,.18),transparent 22rem);pointer-events:none}.spotify-copy>*{position:relative;z-index:1}.spotify-copy h2{font-size:clamp(2.25rem,5.4vw,4.5rem);letter-spacing:-.06em;margin:.6rem 0 1rem}.spotify-copy p{color:var(--muted);font-size:1.06rem;max-width:560px}.spotify-badge{display:inline-flex;align-items:center;gap:.5rem;width:max-content;border:1px solid rgba(30,215,96,.34);background:rgba(30,215,96,.12);color:#9effb8;border-radius:999px;padding:.48rem .7rem;font-weight:900;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase}.spotify-actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem}.spotify-button{min-height:52px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:0 1.15rem;font-weight:900;color:#061006;background:linear-gradient(135deg,#7dff9e,#1ed760 52%,#0e9f41);box-shadow:0 16px 34px rgba(30,215,96,.2);transition:transform .16s ease,box-shadow .16s ease}.spotify-button:hover{transform:translateY(-3px);box-shadow:0 20px 42px rgba(30,215,96,.28)}.spotify-alt{min-height:52px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:0 1.15rem;font-weight:900;color:var(--txt);border:1px solid var(--line);background:rgba(255,255,255,.08)}.spotify-embed-card{overflow:hidden;min-height:380px}.spotify-embed-card iframe{display:block;width:100%;min-height:380px;border:0}@media(max-width:900px){.spotify-layout{grid-template-columns:1fr}}@media(max-width:720px){.spotify-actions a{width:100%}.spotify-embed-card iframe{min-height:420px}.nav a[href="#experience"]{display:none}}
   </style>
 </head>
 <body>
@@ -33,8 +33,8 @@
     </a>
 
     <nav class="nav" aria-label="Main navigation">
-      <a href="#videos">Videos</a>
       <a href="#spotify">Spotify</a>
+      <a href="#videos">Videos</a>
       <a href="#moods">Moods</a>
       <a href="#experience">Experience</a>
       <a class="nav-cta" href="https://www.youtube.com/@loungemusiq?sub_confirmation=1" target="_blank" rel="noopener">▶ Subscribe</a>
@@ -54,8 +54,8 @@
           <p class="sub">Premium lounge music for golden sunsets, private beach club nights, calm focus sessions and luxury travel dreams.</p>
 
           <div class="btn-row">
+            <a class="btn btn-gold" href="#spotify">♫ Listen on Spotify</a>
             <a class="btn btn-yt" href="https://www.youtube.com/@loungemusiq" target="_blank" rel="noopener">▶ Watch on YouTube</a>
-            <a class="btn btn-gold" href="#spotify">♫ Spotify Artist</a>
           </div>
         </div>
 
@@ -80,6 +80,26 @@
       <article class="card reveal"><span class="emoji">🎧</span><h3>Focus Flow</h3><p>Low-distraction grooves for work, reading, studying and calm creative sessions.</p></article>
     </section>
 
+    <section class="spotify-section wrap" id="spotify">
+      <div class="spotify-layout reveal">
+        <div class="spotify-copy">
+          <div>
+            <span class="spotify-badge">● Spotify Artist</span>
+            <p class="eyebrow" style="margin-top:1rem">listen on spotify</p>
+            <h2>Lounge Musiq on Spotify</h2>
+            <p>Stream the official Lounge Musiq artist profile directly here. Visitors can preview music, open Spotify and continue listening in the Spotify app.</p>
+          </div>
+          <div class="spotify-actions">
+            <a class="spotify-button" href="https://open.spotify.com/artist/4Y6P3koTk32nA3QVJbLmsT" target="_blank" rel="noopener">Open in Spotify →</a>
+            <a class="spotify-alt" href="#videos">Watch YouTube Videos</a>
+          </div>
+        </div>
+        <div class="spotify-embed-card" aria-label="Lounge Musiq Spotify artist player">
+          <iframe style="border-radius:24px" src="https://open.spotify.com/embed/artist/4Y6P3koTk32nA3QVJbLmsT?utm_source=generator&theme=0" width="100%" height="380" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+      </div>
+    </section>
+
     <section class="videos wrap" id="videos">
       <div class="videos-head reveal">
         <div><p class="eyebrow">dynamic YouTube integration</p><h2>Latest Lounge Musiq Sessions</h2></div>
@@ -96,22 +116,6 @@
       <div class="video-grid" id="videoGrid" aria-live="polite"><div class="video-loading">Loading latest lounge sessions…</div></div>
     </section>
 
-    <section class="spotify-section wrap" id="spotify">
-      <div class="spotify-layout reveal">
-        <div class="spotify-copy">
-          <div>
-            <p class="eyebrow">listen on spotify</p>
-            <h2>Lounge Musiq on Spotify</h2>
-            <p>Stream the official Lounge Musiq artist profile directly here. Perfect for relaxed evenings, focus sessions and elegant background listening.</p>
-          </div>
-          <div class="spotify-actions"><a class="spotify-button" href="https://open.spotify.com/artist/4Y6P3koTk32nA3QVJbLmsT" target="_blank" rel="noopener">Open in Spotify →</a></div>
-        </div>
-        <div class="spotify-embed-card" aria-label="Lounge Musiq Spotify artist player">
-          <iframe style="border-radius:24px" src="https://open.spotify.com/embed/artist/4Y6P3koTk32nA3QVJbLmsT?utm_source=generator&theme=0" width="100%" height="352" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-        </div>
-      </div>
-    </section>
-
     <section class="moods wrap" id="moods">
       <div class="videos-head reveal"><div><p class="eyebrow">sound universe</p><h2>Four premium listening worlds</h2></div></div>
       <div class="mood-grid">
@@ -125,15 +129,15 @@
     <section class="experience" id="experience">
       <div class="wrap experience-card reveal">
         <div><p class="eyebrow">brand experience</p><h2>Designed like a premium music brand.</h2></div>
-        <p>Lounge Musiq combines luxury beach visuals, glassmorphism design, smooth scroll animation, dynamic video loading, Spotify playback and a calm high-end sound identity.</p>
+        <p>Lounge Musiq combines luxury beach visuals, glassmorphism design, smooth scroll animation, Spotify playback, dynamic video loading and a calm high-end sound identity.</p>
       </div>
     </section>
   </main>
 
   <footer class="footer wrap">
     <div class="socials">
-      <a href="https://www.youtube.com/@loungemusiq" target="_blank" rel="noopener" title="YouTube">▶</a>
       <a href="https://open.spotify.com/artist/4Y6P3koTk32nA3QVJbLmsT" target="_blank" rel="noopener" title="Spotify">♬</a>
+      <a href="https://www.youtube.com/@loungemusiq" target="_blank" rel="noopener" title="YouTube">▶</a>
     </div>
     <p class="brand-tag">Lounge Musiq — Chill • Relax • Unwind</p>
     <p>© <span id="year"></span> Lounge Musiq. All rights reserved.</p>
