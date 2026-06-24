@@ -27,6 +27,32 @@ const videoIntro = $('#videoIntro');
 const moodTitle = $('[data-now-title]');
 const moodCopy = $('[data-now-copy]');
 
+function polishLabelCopy() {
+  const nowLabel = $('.now-top span');
+  if (nowLabel && nowLabel.textContent.trim() === 'A&R direction') {
+    nowLabel.textContent = 'Selected mood';
+  }
+
+  $$('.card').forEach((card) => {
+    const title = $('h3', card);
+    const copy = $('p', card);
+    if (!title || !copy) return;
+
+    if (title.textContent.trim() === 'Creator utility') {
+      title.textContent = 'Cinematic use';
+      copy.textContent = 'Music shaped for premium visuals, long-form ambience, storytelling and calm focus.';
+    }
+  });
+
+  $$('.spotify-copy h2').forEach((title) => {
+    if (title.textContent.trim() === 'Listen to the label sound.') {
+      title.textContent = 'Enter the Lounge Musiq sound.';
+    }
+  });
+}
+
+polishLabelCopy();
+
 const moodContent = {
   sunset: {
     title: 'Sunset Lounge Session',
