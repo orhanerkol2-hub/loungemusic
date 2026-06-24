@@ -1,7 +1,7 @@
 const CHANNEL = {
   name: "LoungeMusic",
-  handle: "@LoungeMusiq",
-  channelUrl: "https://www.youtube.com/@LoungeMusiq",
+  handle: "@loungemusiq",
+  channelUrl: "https://www.youtube.com/@loungemusiq",
 
   // Recommended simple live option:
   // 1) Find your YouTube Channel ID. It usually starts with "UC".
