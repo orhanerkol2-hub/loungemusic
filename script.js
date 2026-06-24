@@ -93,7 +93,7 @@ const revealObserver = new IntersectionObserver((entries) => {
 $$('.reveal').forEach((item) => revealObserver.observe(item));
 
 function esc(value = '') {
-  return String(value).replace(/[&<>\"]/g, (char) => ({
+  return String(value).replace(/[&<>"]/g, (char) => ({
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
@@ -200,14 +200,14 @@ function renderFallback() {
   videoGrid.innerHTML = `
     <a class="video-card" href="${CHANNEL.videosUrl}" target="_blank" rel="noopener">
       <div class="video-info">
-        <h3>Open the latest Lounge Musiq videos</h3>
-        <p class="date">YouTube feed is ready. Add the UC channel ID in script.js for full live cards.</p>
+        <h3>Watch the latest Lounge Musiq visuals</h3>
+        <p class="date">Premium lounge visuals, sunset ambience and deep chill sessions.</p>
       </div>
     </a>
     <a class="video-card" href="${CHANNEL.url}" target="_blank" rel="noopener">
       <div class="video-info">
-        <h3>Subscribe to Lounge Musiq</h3>
-        <p class="date">Chill • Relax • Unwind</p>
+        <h3>Subscribe to the label channel</h3>
+        <p class="date">Lounge Musiq — Premium Lounge Label</p>
       </div>
     </a>`;
 }
