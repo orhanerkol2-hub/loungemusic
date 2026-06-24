@@ -1,56 +1,50 @@
+document.getElementById('year').textContent = new Date().getFullYear();
+
 const CHANNEL = {
-  name: "Lounge Musiq",
-  handle: "@loungemusiq",
-  channelUrl: "https://www.youtube.com/@loungemusiq",
+  name: 'Lounge Musiq',
+  handle: '@loungemusiq',
+  url: 'https://www.youtube.com/@loungemusiq',
+  videosUrl: 'https://www.youtube.com/@loungemusiq/videos',
 
-  // Simple live option:
-  // YouTube Channel ID starts with UC. The uploads playlist starts with UU.
-  // Example: UCabc123 -> UUabc123
-  uploadsPlaylistId: "",
+  // Optional: Paste your UC... channel ID here for the most reliable RSS feed.
+  channelId: '',
 
-  // Advanced live cards option:
-  // Add a restricted YouTube Data API v3 browser key and the Channel ID.
-  youtubeApiKey: "",
-  youtubeChannelId: "",
+  // Optional: Paste your UU... uploads playlist ID here for a direct embedded playlist fallback.
+  uploadsPlaylistId: '',
 
-  maxVideos: 8
+  maxVideos: 6
 };
 
 const $ = (selector, scope = document) => scope.querySelector(selector);
-const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
+const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
 
-const channelLinks = $$('[data-channel-link]');
-const featuredVideo = $('#featuredVideo');
-const videoGrid = $('#videoGrid');
-const videoEmpty = $('#videoEmpty');
-const year = $('#year');
 const header = $('[data-header]');
 const cursorGlow = $('[data-cursor-glow]');
 const heroBg = $('.hero-bg');
+const videoGrid = $('#videoGrid');
+const videoEmbed = $('#videoEmbed');
+const videoIntro = $('#videoIntro');
 const moodTitle = $('[data-now-title]');
 const moodCopy = $('[data-now-copy]');
-
-year.textContent = new Date().getFullYear();
-channelLinks.forEach((link) => { link.href = CHANNEL.channelUrl; });
 
 const moodContent = {
   sunset: {
     title: 'Sunset Lounge Session',
-    copy: 'Warm keys, soft percussion, deep bass and smooth ocean-night atmosphere.'
+    copy: 'Warm keys, soft percussion, deep bass and ocean-night ambience.'
   },
   night: {
     title: 'Dubai Night Chill',
-    copy: 'A darker late-night mood with elegant bass, skyline ambience and premium hotel-lounge energy.'
+    copy: 'Elegant late-night bass, warm skyline atmosphere and private lounge energy.'
   },
   focus: {
     title: 'Luxury Focus Flow',
-    copy: 'Minimal distraction, soft rhythmic motion and calm background energy for work and reading.'
+    copy: 'Soft rhythm, minimal distraction and calm momentum for work or reading.'
   }
 };
 
 window.addEventListener('scroll', () => {
   const y = window.scrollY;
-  header.classList.toggle('is-scrolled', y > 18);
+  if (header) header.classList.toggle('is-scrolled', y > 18);
   if (heroBg) heroBg.style.transform = `scale(1.035) translateY(${Math.min(y * 0.08, 42)}px)`;
 }, { passive: true });
 
@@ -59,11 +53,6 @@ window.addEventListener('pointermove', (event) => {
   cursorGlow.style.left = `${event.clientX}px`;
   cursorGlow.style.top = `${event.clientY}px`;
 }, { passive: true });
-
-$('[data-theme-toggle]')?.addEventListener('click', (event) => {
-  document.body.classList.toggle('warm-mode');
-  event.currentTarget.textContent = document.body.classList.contains('warm-mode') ? '☀' : '☾';
-});
 
 $$('[data-mood]').forEach((button) => {
   button.addEventListener('click', () => {
@@ -81,9 +70,7 @@ $$('[data-tilt-card]').forEach((card) => {
     const rect = card.getBoundingClientRect();
     const x = (event.clientX - rect.left) / rect.width;
     const y = (event.clientY - rect.top) / rect.height;
-    const rotateX = (0.5 - y) * 7;
-    const rotateY = (x - 0.5) * 7;
-    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    card.style.transform = `rotateX(${(0.5 - y) * 7}deg) rotateY(${(x - 0.5) * 7}deg)`;
     card.style.setProperty('--mx', `${x * 100}%`);
     card.style.setProperty('--my', `${y * 100}%`);
   });
@@ -105,146 +92,140 @@ const revealObserver = new IntersectionObserver((entries) => {
 
 $$('.reveal').forEach((item) => revealObserver.observe(item));
 
-function formatDate(value) {
-  if (!value) return 'New upload';
-  return new Intl.DateTimeFormat('en', {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit'
-  }).format(new Date(value));
+function esc(value = '') {
+  return String(value).replace(/[&<>\"]/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;'
+  }[char]));
 }
 
-function sanitize(text = '') {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+function fmtDate(iso) {
+  try {
+    return new Date(iso).toLocaleDateString('en', { day: '2-digit', month: 'short', year: 'numeric' });
+  } catch {
+    return '';
+  }
 }
 
-function getUploadsEmbedUrl() {
-  if (!CHANNEL.uploadsPlaylistId) return '';
-  const params = new URLSearchParams({
-    list: CHANNEL.uploadsPlaylistId,
-    rel: '0',
-    modestbranding: '1'
-  });
-  return `https://www.youtube-nocookie.com/embed/videoseries?${params.toString()}`;
+function proxied(url) {
+  return [
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    `https://corsproxy.io/?url=${encodeURIComponent(url)}`
+  ];
 }
 
-function renderPlaylistFallback() {
-  const embedUrl = getUploadsEmbedUrl();
+async function fetchWithProxies(url) {
+  for (const proxyUrl of proxied(url)) {
+    try {
+      const response = await fetch(proxyUrl, { cache: 'no-store' });
+      if (!response.ok) continue;
+      const text = await response.text();
+      if (text && text.length > 80) return text;
+    } catch {
+      // Try next proxy.
+    }
+  }
+  return null;
+}
 
-  if (!embedUrl) {
-    videoEmpty.hidden = false;
-    videoGrid.innerHTML = `
-      <article class="video-card">
-        <div class="video-card-content">
-          <h3>Live YouTube area prepared</h3>
-          <p>Add your Uploads Playlist ID in script.js to activate the newest-video player.</p>
-        </div>
-      </article>
-      <article class="video-card">
-        <div class="video-card-content">
-          <h3>Direct channel link active</h3>
-          <p>All YouTube buttons already point to ${sanitize(CHANNEL.handle)}.</p>
-        </div>
-      </article>
-    `;
-    return;
+async function resolveChannelId() {
+  if (CHANNEL.channelId) return CHANNEL.channelId;
+
+  const html = await fetchWithProxies(CHANNEL.url);
+  if (!html) return '';
+
+  const patterns = [
+    /"channelId":"(UC[^"]+)"/,
+    /"externalId":"(UC[^"]+)"/,
+    /itemprop="channelId" content="(UC[^"]+)"/,
+    /<meta itemprop="channelId" content="(UC[^"]+)"/
+  ];
+
+  for (const pattern of patterns) {
+    const match = html.match(pattern);
+    if (match && match[1]) return match[1];
   }
 
-  featuredVideo.innerHTML = `
-    <iframe
-      title="${sanitize(CHANNEL.name)} latest uploads"
-      src="${embedUrl}"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      allowfullscreen></iframe>
-  `;
+  return '';
+}
 
-  videoEmpty.hidden = true;
+function renderVideos(xmlText) {
+  const xml = new DOMParser().parseFromString(xmlText, 'text/xml');
+  const entries = Array.from(xml.getElementsByTagName('entry')).slice(0, CHANNEL.maxVideos);
+  if (!entries.length) throw new Error('No videos found');
+
+  const cards = entries.map((entry) => {
+    const idNode = entry.getElementsByTagName('yt:videoId')[0] || entry.getElementsByTagName('videoId')[0];
+    const titleNode = entry.getElementsByTagName('title')[0];
+    const publishedNode = entry.getElementsByTagName('published')[0];
+    const id = idNode ? idNode.textContent : '';
+    const title = titleNode ? titleNode.textContent : 'Lounge Musiq Session';
+    const published = publishedNode ? publishedNode.textContent : '';
+    if (!id) return '';
+
+    return `
+      <a class="video-card reveal is-visible" href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener" title="${esc(title)}">
+        <div class="video-thumb">
+          <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="${esc(title)}" loading="lazy" />
+          <span class="play" aria-hidden="true">▶</span>
+        </div>
+        <div class="video-info">
+          <h3>${esc(title)}</h3>
+          <p class="date">${fmtDate(published)}</p>
+        </div>
+      </a>`;
+  }).join('');
+
+  videoGrid.hidden = false;
+  videoGrid.innerHTML = cards;
+
+  const firstIdNode = entries[0].getElementsByTagName('yt:videoId')[0] || entries[0].getElementsByTagName('videoId')[0];
+  const firstId = firstIdNode ? firstIdNode.textContent : '';
+  if (firstId) {
+    videoIntro.hidden = true;
+    videoEmbed.hidden = false;
+    videoEmbed.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${firstId}?rel=0&modestbranding=1" title="Lounge Musiq latest video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  }
+}
+
+function renderFallback() {
+  if (CHANNEL.uploadsPlaylistId) {
+    videoIntro.hidden = true;
+    videoEmbed.hidden = false;
+    videoEmbed.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/videoseries?list=${CHANNEL.uploadsPlaylistId}&rel=0&modestbranding=1" title="Lounge Musiq uploads" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  }
+
   videoGrid.innerHTML = `
-    <article class="video-card">
-      <div class="video-card-content">
-        <h3>Live uploads playlist connected</h3>
-        <p>The featured player automatically shows your newest YouTube uploads.</p>
-      </div>
-    </article>
-    <article class="video-card">
-      <div class="video-card-content">
-        <h3>Upgrade available</h3>
-        <p>Add a YouTube API key to display individual video cards with thumbnails and dates.</p>
-      </div>
-    </article>
-  `;
-}
-
-function renderFeaturedVideo(video) {
-  featuredVideo.innerHTML = `
-    <iframe
-      title="${sanitize(video.title)}"
-      src="https://www.youtube-nocookie.com/embed/${video.id}?rel=0&modestbranding=1"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      allowfullscreen></iframe>
-  `;
-}
-
-function renderVideoCards(videos) {
-  videoGrid.innerHTML = videos.map((video) => `
-    <a class="video-card" href="https://www.youtube.com/watch?v=${video.id}" target="_blank" rel="noopener" aria-label="Watch ${sanitize(video.title)} on YouTube">
-      <img src="${video.thumbnail}" alt="${sanitize(video.title)} thumbnail" loading="lazy" />
-      <div class="video-card-content">
-        <h3>${sanitize(video.title)}</h3>
-        <p>${formatDate(video.publishedAt)}</p>
+    <a class="video-card" href="${CHANNEL.videosUrl}" target="_blank" rel="noopener">
+      <div class="video-info">
+        <h3>Open the latest Lounge Musiq videos</h3>
+        <p class="date">YouTube feed is ready. Add the UC channel ID in script.js for full live cards.</p>
       </div>
     </a>
-  `).join('');
+    <a class="video-card" href="${CHANNEL.url}" target="_blank" rel="noopener">
+      <div class="video-info">
+        <h3>Subscribe to Lounge Musiq</h3>
+        <p class="date">Chill • Relax • Unwind</p>
+      </div>
+    </a>`;
 }
 
-async function fetchVideosFromYouTubeApi() {
-  const params = new URLSearchParams({
-    part: 'snippet',
-    channelId: CHANNEL.youtubeChannelId,
-    maxResults: String(CHANNEL.maxVideos),
-    order: 'date',
-    type: 'video',
-    key: CHANNEL.youtubeApiKey
-  });
-
-  const response = await fetch(`https://www.googleapis.com/youtube/v3/search?${params.toString()}`);
-  if (!response.ok) throw new Error(`YouTube API error: ${response.status}`);
-
-  const data = await response.json();
-  return (data.items || [])
-    .filter((item) => item.id?.videoId && item.snippet)
-    .map((item) => ({
-      id: item.id.videoId,
-      title: item.snippet.title,
-      publishedAt: item.snippet.publishedAt,
-      thumbnail: item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.medium?.url || item.snippet.thumbnails?.default?.url
-    }));
-}
-
-async function initVideos() {
-  const hasApiConfig = CHANNEL.youtubeApiKey && CHANNEL.youtubeChannelId;
-
-  if (!hasApiConfig) {
-    renderPlaylistFallback();
-    return;
-  }
-
+async function loadVideos() {
   try {
-    const videos = await fetchVideosFromYouTubeApi();
-    if (!videos.length) {
-      renderPlaylistFallback();
-      return;
-    }
+    const channelId = await resolveChannelId();
+    if (!channelId) throw new Error('Channel ID could not be resolved');
 
-    renderFeaturedVideo(videos[0]);
-    renderVideoCards(videos);
-    videoEmpty.hidden = true;
+    const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+    const xmlText = await fetchWithProxies(feedUrl);
+    if (!xmlText || !xmlText.includes('<entry')) throw new Error('Feed not available');
+
+    renderVideos(xmlText);
   } catch (error) {
     console.warn(error);
-    renderPlaylistFallback();
+    renderFallback();
   }
 }
 
-initVideos();
+loadVideos();
