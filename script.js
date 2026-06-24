@@ -5,13 +5,8 @@ const CHANNEL = {
   handle: '@loungemusiq',
   url: 'https://www.youtube.com/@loungemusiq',
   videosUrl: 'https://www.youtube.com/@loungemusiq/videos',
-
-  // Optional: Paste your UC... channel ID here for the most reliable RSS feed.
   channelId: '',
-
-  // Optional: Paste your UU... uploads playlist ID here for a direct embedded playlist fallback.
   uploadsPlaylistId: '',
-
   maxVideos: 6
 };
 
@@ -24,23 +19,6 @@ const heroBg = $('.hero-bg');
 const videoGrid = $('#videoGrid');
 const videoEmbed = $('#videoEmbed');
 const videoIntro = $('#videoIntro');
-const moodTitle = $('[data-now-title]');
-const moodCopy = $('[data-now-copy]');
-
-const moodContent = {
-  sunset: {
-    title: 'Sunset Lounge Session',
-    copy: 'Warm keys, soft percussion, deep bass and ocean-night ambience.'
-  },
-  night: {
-    title: 'Dubai Night Chill',
-    copy: 'Elegant late-night bass, warm skyline atmosphere and private lounge energy.'
-  },
-  focus: {
-    title: 'Luxury Focus Flow',
-    copy: 'Soft rhythm, minimal distraction and calm momentum for work or reading.'
-  }
-};
 
 window.addEventListener('scroll', () => {
   const y = window.scrollY;
@@ -54,33 +32,6 @@ window.addEventListener('pointermove', (event) => {
   cursorGlow.style.top = `${event.clientY}px`;
 }, { passive: true });
 
-$$('[data-mood]').forEach((button) => {
-  button.addEventListener('click', () => {
-    const mood = moodContent[button.dataset.mood];
-    if (!mood) return;
-    $$('[data-mood]').forEach((item) => item.classList.remove('is-active'));
-    button.classList.add('is-active');
-    moodTitle.textContent = mood.title;
-    moodCopy.textContent = mood.copy;
-  });
-});
-
-$$('[data-tilt-card]').forEach((card) => {
-  card.addEventListener('pointermove', (event) => {
-    const rect = card.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width;
-    const y = (event.clientY - rect.top) / rect.height;
-    card.style.transform = `rotateX(${(0.5 - y) * 7}deg) rotateY(${(x - 0.5) * 7}deg)`;
-    card.style.setProperty('--mx', `${x * 100}%`);
-    card.style.setProperty('--my', `${y * 100}%`);
-  });
-  card.addEventListener('pointerleave', () => {
-    card.style.transform = '';
-    card.style.removeProperty('--mx');
-    card.style.removeProperty('--my');
-  });
-});
-
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
@@ -88,25 +39,20 @@ const revealObserver = new IntersectionObserver((entries) => {
       revealObserver.unobserve(entry.target);
     }
   });
-}, { threshold: 0.14 });
+}, { threshold: 0.12 });
 
 $$('.reveal').forEach((item) => revealObserver.observe(item));
 
 function esc(value = '') {
   return String(value).replace(/[&<>"]/g, (char) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;'
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
   }[char]));
 }
 
 function fmtDate(iso) {
   try {
     return new Date(iso).toLocaleDateString('en', { day: '2-digit', month: 'short', year: 'numeric' });
-  } catch {
-    return '';
-  }
+  } catch { return ''; }
 }
 
 function proxied(url) {
@@ -123,9 +69,7 @@ async function fetchWithProxies(url) {
       if (!response.ok) continue;
       const text = await response.text();
       if (text && text.length > 80) return text;
-    } catch {
-      // Try next proxy.
-    }
+    } catch { /* Try next proxy */ }
   }
   return null;
 }
@@ -147,7 +91,6 @@ async function resolveChannelId() {
     const match = html.match(pattern);
     if (match && match[1]) return match[1];
   }
-
   return '';
 }
 
