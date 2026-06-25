@@ -1,111 +1,29 @@
 document.getElementById('year').textContent = new Date().getFullYear();
 
 const CHANNEL = {
-  name: 'Lounge Musiq',
   handle: '@loungemusiq',
   url: 'https://www.youtube.com/@loungemusiq',
   videosUrl: 'https://www.youtube.com/@loungemusiq/videos',
-
-  // Optional: Paste your UC... channel ID here for the most reliable RSS feed.
   channelId: '',
-
-  // Optional: Paste your UU... uploads playlist ID here for a direct embedded playlist fallback.
   uploadsPlaylistId: '',
-
   maxVideos: 6
 };
 
-const $ = (selector, scope = document) => scope.querySelector(selector);
-const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
+const $ = (sel, scope = document) => scope.querySelector(sel);
+const $$ = (sel, scope = document) => Array.from(scope.querySelectorAll(sel));
 
 const header = $('[data-header]');
-const cursorGlow = $('[data-cursor-glow]');
 const heroBg = $('.hero-bg');
 const videoGrid = $('#videoGrid');
 const videoEmbed = $('#videoEmbed');
 const videoIntro = $('#videoIntro');
-const moodTitle = $('[data-now-title]');
-const moodCopy = $('[data-now-copy]');
-
-function polishLabelCopy() {
-  const nowLabel = $('.now-top span');
-  if (nowLabel && nowLabel.textContent.trim() === 'A&R direction') {
-    nowLabel.textContent = 'Selected mood';
-  }
-
-  $$('.card').forEach((card) => {
-    const title = $('h3', card);
-    const copy = $('p', card);
-    if (!title || !copy) return;
-
-    if (title.textContent.trim() === 'Creator utility') {
-      title.textContent = 'Cinematic use';
-      copy.textContent = 'Music shaped for premium visuals, long-form ambience, storytelling and calm focus.';
-    }
-  });
-
-  $$('.spotify-copy h2').forEach((title) => {
-    if (title.textContent.trim() === 'Listen to the label sound.') {
-      title.textContent = 'Enter the Lounge Musiq sound.';
-    }
-  });
-}
-
-polishLabelCopy();
-
-const moodContent = {
-  sunset: {
-    title: 'Sunset Lounge Session',
-    copy: 'Warm keys, soft percussion, deep bass and ocean-night ambience.'
-  },
-  night: {
-    title: 'Dubai Night Chill',
-    copy: 'Elegant late-night bass, warm skyline atmosphere and private lounge energy.'
-  },
-  focus: {
-    title: 'Luxury Focus Flow',
-    copy: 'Soft rhythm, minimal distraction and calm momentum for work or reading.'
-  }
-};
+const videoFeature = $('#videoFeature');
 
 window.addEventListener('scroll', () => {
   const y = window.scrollY;
   if (header) header.classList.toggle('is-scrolled', y > 18);
-  if (heroBg) heroBg.style.transform = `scale(1.035) translateY(${Math.min(y * 0.08, 42)}px)`;
+  if (heroBg) heroBg.style.transform = `scale(1.04) translateY(${Math.min(y * 0.06, 36)}px)`;
 }, { passive: true });
-
-window.addEventListener('pointermove', (event) => {
-  if (!cursorGlow) return;
-  cursorGlow.style.left = `${event.clientX}px`;
-  cursorGlow.style.top = `${event.clientY}px`;
-}, { passive: true });
-
-$$('[data-mood]').forEach((button) => {
-  button.addEventListener('click', () => {
-    const mood = moodContent[button.dataset.mood];
-    if (!mood) return;
-    $$('[data-mood]').forEach((item) => item.classList.remove('is-active'));
-    button.classList.add('is-active');
-    moodTitle.textContent = mood.title;
-    moodCopy.textContent = mood.copy;
-  });
-});
-
-$$('[data-tilt-card]').forEach((card) => {
-  card.addEventListener('pointermove', (event) => {
-    const rect = card.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width;
-    const y = (event.clientY - rect.top) / rect.height;
-    card.style.transform = `rotateX(${(0.5 - y) * 7}deg) rotateY(${(x - 0.5) * 7}deg)`;
-    card.style.setProperty('--mx', `${x * 100}%`);
-    card.style.setProperty('--my', `${y * 100}%`);
-  });
-  card.addEventListener('pointerleave', () => {
-    card.style.transform = '';
-    card.style.removeProperty('--mx');
-    card.style.removeProperty('--my');
-  });
-});
 
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
@@ -114,25 +32,31 @@ const revealObserver = new IntersectionObserver((entries) => {
       revealObserver.unobserve(entry.target);
     }
   });
-}, { threshold: 0.14 });
+}, { threshold: 0.12 });
+$$('.reveal').forEach((el) => revealObserver.observe(el));
 
-$$('.reveal').forEach((item) => revealObserver.observe(item));
-
-function esc(value = '') {
-  return String(value).replace(/[&<>"]/g, (char) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;'
-  }[char]));
+function esc(val = '') {
+  return String(val).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
 
 function fmtDate(iso) {
   try {
     return new Date(iso).toLocaleDateString('en', { day: '2-digit', month: 'short', year: 'numeric' });
-  } catch {
-    return '';
-  }
+  } catch { return ''; }
+}
+
+function embedVideo(videoId) {
+  videoIntro.hidden = true;
+  videoEmbed.hidden = false;
+  videoEmbed.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?rel=0&autoplay=1&modestbranding=1" title="Lounge Musiq session" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+}
+
+function playVideo(videoId) {
+  embedVideo(videoId);
+  $$('.video-card').forEach((c) => c.classList.remove('is-playing'));
+  const active = $(`.video-card[data-video-id="${videoId}"]`);
+  if (active) active.classList.add('is-playing');
+  if (videoFeature) videoFeature.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function proxied(url) {
@@ -145,35 +69,28 @@ function proxied(url) {
 async function fetchWithProxies(url) {
   for (const proxyUrl of proxied(url)) {
     try {
-      const response = await fetch(proxyUrl, { cache: 'no-store' });
-      if (!response.ok) continue;
-      const text = await response.text();
+      const res = await fetch(proxyUrl, { cache: 'no-store' });
+      if (!res.ok) continue;
+      const text = await res.text();
       if (text && text.length > 80) return text;
-    } catch {
-      // Try next proxy.
-    }
+    } catch { /* next */ }
   }
   return null;
 }
 
 async function resolveChannelId() {
   if (CHANNEL.channelId) return CHANNEL.channelId;
-
   const html = await fetchWithProxies(CHANNEL.url);
   if (!html) return '';
-
   const patterns = [
     /"channelId":"(UC[^"]+)"/,
     /"externalId":"(UC[^"]+)"/,
-    /itemprop="channelId" content="(UC[^"]+)"/,
-    /<meta itemprop="channelId" content="(UC[^"]+)"/
+    /itemprop="channelId" content="(UC[^"]+)"/
   ];
-
-  for (const pattern of patterns) {
-    const match = html.match(pattern);
-    if (match && match[1]) return match[1];
+  for (const p of patterns) {
+    const m = html.match(p);
+    if (m && m[1]) return m[1];
   }
-
   return '';
 }
 
@@ -182,58 +99,64 @@ function renderVideos(xmlText) {
   const entries = Array.from(xml.getElementsByTagName('entry')).slice(0, CHANNEL.maxVideos);
   if (!entries.length) throw new Error('No videos found');
 
+  const firstIdNode = entries[0].getElementsByTagName('yt:videoId')[0] || entries[0].getElementsByTagName('videoId')[0];
+  const firstId = firstIdNode ? firstIdNode.textContent : '';
+  if (firstId) embedVideo(firstId);
+
   const cards = entries.map((entry) => {
     const idNode = entry.getElementsByTagName('yt:videoId')[0] || entry.getElementsByTagName('videoId')[0];
     const titleNode = entry.getElementsByTagName('title')[0];
-    const publishedNode = entry.getElementsByTagName('published')[0];
+    const pubNode = entry.getElementsByTagName('published')[0];
     const id = idNode ? idNode.textContent : '';
     const title = titleNode ? titleNode.textContent : 'Lounge Musiq Session';
-    const published = publishedNode ? publishedNode.textContent : '';
+    const published = pubNode ? pubNode.textContent : '';
     if (!id) return '';
 
     return `
-      <a class="video-card reveal is-visible" href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener" title="${esc(title)}">
+      <div class="video-card reveal is-visible${id === firstId ? ' is-playing' : ''}" data-video-id="${id}" role="button" tabindex="0" aria-label="Play ${esc(title)}">
         <div class="video-thumb">
           <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="${esc(title)}" loading="lazy" />
-          <span class="play" aria-hidden="true">▶</span>
+          <span class="play-icon" aria-hidden="true">&#9654;</span>
         </div>
         <div class="video-info">
           <h3>${esc(title)}</h3>
-          <p class="date">${fmtDate(published)}</p>
+          <p class="video-date">${fmtDate(published)}</p>
         </div>
-      </a>`;
+      </div>`;
   }).join('');
 
-  videoGrid.hidden = false;
   videoGrid.innerHTML = cards;
 
-  const firstIdNode = entries[0].getElementsByTagName('yt:videoId')[0] || entries[0].getElementsByTagName('videoId')[0];
-  const firstId = firstIdNode ? firstIdNode.textContent : '';
-  if (firstId) {
-    videoIntro.hidden = true;
-    videoEmbed.hidden = false;
-    videoEmbed.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${firstId}?rel=0&modestbranding=1" title="Lounge Musiq latest video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-  }
+  videoGrid.addEventListener('click', (e) => {
+    const card = e.target.closest('.video-card');
+    if (card && card.dataset.videoId) playVideo(card.dataset.videoId);
+  });
+  videoGrid.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      const card = e.target.closest('.video-card');
+      if (card && card.dataset.videoId) { e.preventDefault(); playVideo(card.dataset.videoId); }
+    }
+  });
 }
 
 function renderFallback() {
   if (CHANNEL.uploadsPlaylistId) {
     videoIntro.hidden = true;
     videoEmbed.hidden = false;
-    videoEmbed.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/videoseries?list=${CHANNEL.uploadsPlaylistId}&rel=0&modestbranding=1" title="Lounge Musiq uploads" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    videoEmbed.innerHTML = `<iframe src="https://www.youtube.com/embed/videoseries?list=${CHANNEL.uploadsPlaylistId}&rel=0&modestbranding=1" title="Lounge Musiq uploads" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
   }
 
   videoGrid.innerHTML = `
     <a class="video-card" href="${CHANNEL.videosUrl}" target="_blank" rel="noopener">
       <div class="video-info">
         <h3>Watch the latest Lounge Musiq visuals</h3>
-        <p class="date">Premium lounge visuals, sunset ambience and deep chill sessions.</p>
+        <p class="video-date">Premium lounge visuals, sunset ambience and deep chill sessions.</p>
       </div>
     </a>
     <a class="video-card" href="${CHANNEL.url}" target="_blank" rel="noopener">
       <div class="video-info">
         <h3>Subscribe to the label channel</h3>
-        <p class="date">Lounge Musiq — Premium Lounge Label</p>
+        <p class="video-date">Lounge Musiq — Premium Lounge Label</p>
       </div>
     </a>`;
 }
@@ -241,15 +164,13 @@ function renderFallback() {
 async function loadVideos() {
   try {
     const channelId = await resolveChannelId();
-    if (!channelId) throw new Error('Channel ID could not be resolved');
-
+    if (!channelId) throw new Error('Channel ID not resolved');
     const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
     const xmlText = await fetchWithProxies(feedUrl);
-    if (!xmlText || !xmlText.includes('<entry')) throw new Error('Feed not available');
-
+    if (!xmlText || !xmlText.includes('<entry')) throw new Error('Feed unavailable');
     renderVideos(xmlText);
-  } catch (error) {
-    console.warn(error);
+  } catch (err) {
+    console.warn('Video load fallback:', err);
     renderFallback();
   }
 }
