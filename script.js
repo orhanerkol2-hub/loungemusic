@@ -5,13 +5,8 @@ const CHANNEL = {
   handle: '@loungemusiq',
   url: 'https://www.youtube.com/@loungemusiq',
   videosUrl: 'https://www.youtube.com/@loungemusiq/videos',
-
-  // Optional: Paste your UC... channel ID here for the most reliable RSS feed.
   channelId: '',
-
-  // Optional: Paste your UU... uploads playlist ID here for a direct embedded playlist fallback.
   uploadsPlaylistId: '',
-
   maxVideos: 6
 };
 
@@ -24,49 +19,6 @@ const heroBg = $('.hero-bg');
 const videoGrid = $('#videoGrid');
 const videoEmbed = $('#videoEmbed');
 const videoIntro = $('#videoIntro');
-const moodTitle = $('[data-now-title]');
-const moodCopy = $('[data-now-copy]');
-
-function polishLabelCopy() {
-  const nowLabel = $('.now-top span');
-  if (nowLabel && nowLabel.textContent.trim() === 'A&R direction') {
-    nowLabel.textContent = 'Selected mood';
-  }
-
-  $$('.card').forEach((card) => {
-    const title = $('h3', card);
-    const copy = $('p', card);
-    if (!title || !copy) return;
-
-    if (title.textContent.trim() === 'Creator utility') {
-      title.textContent = 'Cinematic use';
-      copy.textContent = 'Music shaped for premium visuals, long-form ambience, storytelling and calm focus.';
-    }
-  });
-
-  $$('.spotify-copy h2').forEach((title) => {
-    if (title.textContent.trim() === 'Listen to the label sound.') {
-      title.textContent = 'Enter the Lounge Musiq sound.';
-    }
-  });
-}
-
-polishLabelCopy();
-
-const moodContent = {
-  sunset: {
-    title: 'Sunset Lounge Session',
-    copy: 'Warm keys, soft percussion, deep bass and ocean-night ambience.'
-  },
-  night: {
-    title: 'Dubai Night Chill',
-    copy: 'Elegant late-night bass, warm skyline atmosphere and private lounge energy.'
-  },
-  focus: {
-    title: 'Luxury Focus Flow',
-    copy: 'Soft rhythm, minimal distraction and calm momentum for work or reading.'
-  }
-};
 
 window.addEventListener('scroll', () => {
   const y = window.scrollY;
@@ -80,33 +32,6 @@ window.addEventListener('pointermove', (event) => {
   cursorGlow.style.top = `${event.clientY}px`;
 }, { passive: true });
 
-$$('[data-mood]').forEach((button) => {
-  button.addEventListener('click', () => {
-    const mood = moodContent[button.dataset.mood];
-    if (!mood) return;
-    $$('[data-mood]').forEach((item) => item.classList.remove('is-active'));
-    button.classList.add('is-active');
-    moodTitle.textContent = mood.title;
-    moodCopy.textContent = mood.copy;
-  });
-});
-
-$$('[data-tilt-card]').forEach((card) => {
-  card.addEventListener('pointermove', (event) => {
-    const rect = card.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width;
-    const y = (event.clientY - rect.top) / rect.height;
-    card.style.transform = `rotateX(${(0.5 - y) * 7}deg) rotateY(${(x - 0.5) * 7}deg)`;
-    card.style.setProperty('--mx', `${x * 100}%`);
-    card.style.setProperty('--my', `${y * 100}%`);
-  });
-  card.addEventListener('pointerleave', () => {
-    card.style.transform = '';
-    card.style.removeProperty('--mx');
-    card.style.removeProperty('--my');
-  });
-});
-
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
@@ -114,25 +39,20 @@ const revealObserver = new IntersectionObserver((entries) => {
       revealObserver.unobserve(entry.target);
     }
   });
-}, { threshold: 0.14 });
+}, { threshold: 0.12 });
 
 $$('.reveal').forEach((item) => revealObserver.observe(item));
 
 function esc(value = '') {
   return String(value).replace(/[&<>"]/g, (char) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;'
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
   }[char]));
 }
 
 function fmtDate(iso) {
   try {
     return new Date(iso).toLocaleDateString('en', { day: '2-digit', month: 'short', year: 'numeric' });
-  } catch {
-    return '';
-  }
+  } catch { return ''; }
 }
 
 function proxied(url) {
@@ -149,9 +69,7 @@ async function fetchWithProxies(url) {
       if (!response.ok) continue;
       const text = await response.text();
       if (text && text.length > 80) return text;
-    } catch {
-      // Try next proxy.
-    }
+    } catch { /* Try next proxy */ }
   }
   return null;
 }
@@ -173,8 +91,22 @@ async function resolveChannelId() {
     const match = html.match(pattern);
     if (match && match[1]) return match[1];
   }
-
   return '';
+}
+
+function embedVideo(videoId, autoplay = false) {
+  videoIntro.hidden = true;
+  videoEmbed.hidden = false;
+  const ap = autoplay ? '&autoplay=1' : '';
+  videoEmbed.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?rel=0${ap}" title="Lounge Musiq" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+}
+
+function playVideo(videoId, card) {
+  $$('.video-card.is-playing', videoGrid).forEach((c) => c.classList.remove('is-playing'));
+  if (card) card.classList.add('is-playing');
+  embedVideo(videoId, true);
+  const section = document.getElementById('videos');
+  if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function renderVideos(xmlText) {
@@ -182,7 +114,7 @@ function renderVideos(xmlText) {
   const entries = Array.from(xml.getElementsByTagName('entry')).slice(0, CHANNEL.maxVideos);
   if (!entries.length) throw new Error('No videos found');
 
-  const cards = entries.map((entry) => {
+  const cards = entries.map((entry, index) => {
     const idNode = entry.getElementsByTagName('yt:videoId')[0] || entry.getElementsByTagName('videoId')[0];
     const titleNode = entry.getElementsByTagName('title')[0];
     const publishedNode = entry.getElementsByTagName('published')[0];
@@ -192,7 +124,7 @@ function renderVideos(xmlText) {
     if (!id) return '';
 
     return `
-      <a class="video-card reveal is-visible" href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener" title="${esc(title)}">
+      <div class="video-card reveal is-visible${index === 0 ? ' is-playing' : ''}" data-video-id="${id}" role="button" tabindex="0" title="${esc(title)}">
         <div class="video-thumb">
           <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="${esc(title)}" loading="lazy" />
           <span class="play" aria-hidden="true">▶</span>
@@ -201,26 +133,32 @@ function renderVideos(xmlText) {
           <h3>${esc(title)}</h3>
           <p class="date">${fmtDate(published)}</p>
         </div>
-      </a>`;
+      </div>`;
   }).join('');
 
   videoGrid.hidden = false;
   videoGrid.innerHTML = cards;
 
+  $$('.video-card[data-video-id]', videoGrid).forEach((card) => {
+    card.addEventListener('click', () => playVideo(card.dataset.videoId, card));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        playVideo(card.dataset.videoId, card);
+      }
+    });
+  });
+
   const firstIdNode = entries[0].getElementsByTagName('yt:videoId')[0] || entries[0].getElementsByTagName('videoId')[0];
   const firstId = firstIdNode ? firstIdNode.textContent : '';
-  if (firstId) {
-    videoIntro.hidden = true;
-    videoEmbed.hidden = false;
-    videoEmbed.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${firstId}?rel=0&modestbranding=1" title="Lounge Musiq latest video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-  }
+  if (firstId) embedVideo(firstId);
 }
 
 function renderFallback() {
   if (CHANNEL.uploadsPlaylistId) {
     videoIntro.hidden = true;
     videoEmbed.hidden = false;
-    videoEmbed.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/videoseries?list=${CHANNEL.uploadsPlaylistId}&rel=0&modestbranding=1" title="Lounge Musiq uploads" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    videoEmbed.innerHTML = `<iframe src="https://www.youtube.com/embed/videoseries?list=${CHANNEL.uploadsPlaylistId}&rel=0" title="Lounge Musiq uploads" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
   }
 
   videoGrid.innerHTML = `
