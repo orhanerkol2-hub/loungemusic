@@ -21,8 +21,8 @@ const videoFeature = $('#videoFeature');
 
 window.addEventListener('scroll', () => {
   const y = window.scrollY;
-  if (header) header.classList.toggle('is-scrolled', y > 18);
-  if (heroBg) heroBg.style.transform = `scale(1.04) translateY(${Math.min(y * 0.06, 36)}px)`;
+  if (header) header.classList.toggle('is-scrolled', y > 40);
+  if (heroBg) heroBg.style.transform = `scale(1.06) translateY(${Math.min(y * 0.05, 30)}px)`;
 }, { passive: true });
 
 const revealObserver = new IntersectionObserver((entries) => {
@@ -32,7 +32,7 @@ const revealObserver = new IntersectionObserver((entries) => {
       revealObserver.unobserve(entry.target);
     }
   });
-}, { threshold: 0.12 });
+}, { threshold: 0.1 });
 $$('.reveal').forEach((el) => revealObserver.observe(el));
 
 function esc(val = '') {
@@ -48,7 +48,7 @@ function fmtDate(iso) {
 function embedVideo(videoId) {
   videoIntro.hidden = true;
   videoEmbed.hidden = false;
-  videoEmbed.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?rel=0&autoplay=1&modestbranding=1" title="Lounge Musiq session" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+  videoEmbed.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?rel=0&autoplay=1&modestbranding=1" title="Lounge Musiq session" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
 }
 
 function playVideo(videoId) {
@@ -116,11 +116,11 @@ function renderVideos(xmlText) {
       <div class="video-card reveal is-visible${id === firstId ? ' is-playing' : ''}" data-video-id="${id}" role="button" tabindex="0" aria-label="Play ${esc(title)}">
         <div class="video-thumb">
           <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="${esc(title)}" loading="lazy" />
-          <span class="play-icon" aria-hidden="true">&#9654;</span>
+          <span class="play-sm" aria-hidden="true">&#9654;</span>
         </div>
-        <div class="video-info">
+        <div class="video-meta">
           <h3>${esc(title)}</h3>
-          <p class="video-date">${fmtDate(published)}</p>
+          <p class="date">${fmtDate(published)}</p>
         </div>
       </div>`;
   }).join('');
@@ -143,20 +143,20 @@ function renderFallback() {
   if (CHANNEL.uploadsPlaylistId) {
     videoIntro.hidden = true;
     videoEmbed.hidden = false;
-    videoEmbed.innerHTML = `<iframe src="https://www.youtube.com/embed/videoseries?list=${CHANNEL.uploadsPlaylistId}&rel=0&modestbranding=1" title="Lounge Musiq uploads" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+    videoEmbed.innerHTML = `<iframe src="https://www.youtube.com/embed/videoseries?list=${CHANNEL.uploadsPlaylistId}&rel=0&modestbranding=1" title="Lounge Musiq uploads" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
   }
 
   videoGrid.innerHTML = `
     <a class="video-card" href="${CHANNEL.videosUrl}" target="_blank" rel="noopener">
-      <div class="video-info">
+      <div class="video-meta">
         <h3>Watch the latest Lounge Musiq visuals</h3>
-        <p class="video-date">Premium lounge visuals, sunset ambience and deep chill sessions.</p>
+        <p class="date">Premium lounge visuals, sunset ambience and deep chill sessions.</p>
       </div>
     </a>
     <a class="video-card" href="${CHANNEL.url}" target="_blank" rel="noopener">
-      <div class="video-info">
+      <div class="video-meta">
         <h3>Subscribe to the label channel</h3>
-        <p class="video-date">Lounge Musiq — Premium Lounge Label</p>
+        <p class="date">Lounge Musiq — Premium Lounge Label</p>
       </div>
     </a>`;
 }

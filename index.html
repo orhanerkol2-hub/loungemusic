@@ -26,7 +26,7 @@
   <link rel="preload" href="92086bf6-273b-41f1-a9d3-061c01c8accc.png" as="image" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 
   <script type="application/ld+json">
@@ -60,114 +60,112 @@
 </head>
 <body>
 
-  <header class="site-header" data-header>
-    <a href="#top" class="logo-mark" aria-label="Lounge Musiq home">
-      <img src="149750%20(1).png" alt="Lounge Musiq logo" />
+  <header class="header" data-header>
+    <a href="#top" class="header-logo" aria-label="Lounge Musiq home">
+      <img src="149750%20(1).png" alt="Lounge Musiq" />
     </a>
-    <nav class="nav" aria-label="Main navigation">
-      <a href="#videos">Videos</a>
+    <nav class="header-nav" aria-label="Main navigation">
+      <a href="#sessions">Sessions</a>
       <a href="#spotify">Spotify</a>
       <a href="#about">About</a>
-      <a class="nav-cta" href="https://www.youtube.com/@loungemusiq?sub_confirmation=1" target="_blank" rel="noopener">Subscribe</a>
+      <a class="header-cta" href="https://www.youtube.com/@loungemusiq?sub_confirmation=1" target="_blank" rel="noopener">Subscribe</a>
     </nav>
   </header>
 
   <main id="top">
-    <!-- Hero -->
-    <section class="hero" aria-label="Lounge Musiq introduction">
+
+    <!-- Hero — fullscreen cinematic -->
+    <section class="hero">
       <div class="hero-bg" aria-hidden="true"></div>
-      <div class="hero-overlay" aria-hidden="true"></div>
-      <div class="wrap hero-inner">
-        <div class="hero-copy reveal">
-          <span class="pill"><span class="pulse-dot"></span> Premium lounge label</span>
-          <img class="hero-logo" src="149750%20(1).png" alt="Lounge Musiq" />
-          <p class="label-sub">part of Z7 Music Group</p>
-          <h1>Sound for slow luxury.</h1>
-          <p class="hero-desc">Refined chillout, deep lounge and sunset ambience — curated for hotels, beach clubs, cinematic visuals and focused listening.</p>
-          <div class="btn-row">
-            <a class="btn btn-primary" href="#videos">Watch sessions</a>
-            <a class="btn btn-outline" href="#spotify">Listen on Spotify</a>
-          </div>
+      <div class="hero-fade" aria-hidden="true"></div>
+      <div class="hero-content reveal">
+        <img class="hero-logo" src="149750%20(1).png" alt="Lounge Musiq" />
+        <p class="hero-label">part of Z7 Music Group</p>
+        <h1>Sound for<br>slow luxury.</h1>
+        <p class="hero-sub">Refined chillout · deep lounge · sunset ambience</p>
+        <div class="hero-actions">
+          <a class="btn btn-glow" href="#sessions">Watch sessions</a>
+          <a class="btn btn-ghost" href="https://www.youtube.com/@loungemusiq?sub_confirmation=1" target="_blank" rel="noopener">Subscribe</a>
         </div>
+      </div>
+      <div class="hero-scroll" aria-hidden="true">
+        <span></span>
       </div>
     </section>
 
-    <!-- Videos — inline YouTube embeds for monetization -->
-    <section class="section" id="videos">
+    <!-- Sessions — inline YouTube for monetization -->
+    <section class="section" id="sessions">
       <div class="wrap">
-        <div class="section-head reveal">
-          <div>
-            <p class="eyebrow">Official Visuals</p>
-            <h2>Lounge Musiq sessions</h2>
-          </div>
-          <a class="link-accent" href="https://www.youtube.com/@loungemusiq/videos" target="_blank" rel="noopener">All videos &rarr;</a>
-        </div>
-        <div class="video-feature reveal" id="videoFeature">
-          <div class="video-embed" id="videoEmbed" hidden></div>
-          <div class="video-intro" id="videoIntro">
-            <div class="video-intro-content">
-              <span class="play-circle">&#9654;</span>
-              <h3>Visual lounge sessions</h3>
-              <p>Premium visual soundscapes — sunset ambience, late-night calm and focused listening.</p>
+        <header class="section-header reveal">
+          <p class="label">Official Visuals</p>
+          <h2>Sessions</h2>
+        </header>
+
+        <div class="player reveal" id="videoFeature">
+          <div class="player-embed" id="videoEmbed" hidden></div>
+          <div class="player-idle" id="videoIntro">
+            <div class="player-idle-inner">
+              <div class="play-ring"><span>&#9654;</span></div>
+              <h3>Lounge Musiq Sessions</h3>
+              <p>Sunset ambience · late-night calm · focused listening</p>
             </div>
           </div>
         </div>
-        <div class="video-grid" id="videoGrid" aria-live="polite">
-          <div class="video-loading">Loading sessions…</div>
+
+        <div class="grid grid--videos" id="videoGrid" aria-live="polite">
+          <div class="loading">Loading sessions…</div>
+        </div>
+
+        <div class="section-footer reveal">
+          <a class="link-arrow" href="https://www.youtube.com/@loungemusiq/videos" target="_blank" rel="noopener">All videos on YouTube &rarr;</a>
         </div>
       </div>
     </section>
 
     <!-- Spotify -->
-    <section class="section section--alt" id="spotify">
+    <section class="section section--flush" id="spotify">
       <div class="wrap">
-        <div class="spotify-layout reveal">
-          <div class="spotify-copy">
-            <div>
-              <span class="spotify-badge">Official Artist Profile</span>
-              <p class="eyebrow">Streaming</p>
-              <h2>Enter the Lounge Musiq sound.</h2>
-              <p>Explore Lounge Musiq on Spotify — refined chillout, deep lounge and sunset ambience for premium listening moments.</p>
-            </div>
+        <div class="spotify-card reveal">
+          <div class="spotify-info">
+            <span class="spotify-pill">Spotify Artist</span>
+            <h2>Listen now.</h2>
+            <p>Explore the full Lounge Musiq catalogue — refined chillout, deep lounge and sunset ambience.</p>
             <div class="spotify-actions">
               <a class="btn btn-spotify" href="https://open.spotify.com/artist/4Y6P3koTk32nA3QVJbLmsT" target="_blank" rel="noopener">Open Spotify</a>
-              <a class="btn btn-outline" href="https://www.youtube.com/@loungemusiq" target="_blank" rel="noopener">YouTube</a>
             </div>
           </div>
-          <div class="spotify-player">
+          <div class="spotify-embed">
             <iframe src="https://open.spotify.com/embed/artist/4Y6P3koTk32nA3QVJbLmsT?utm_source=generator&theme=0" width="100%" height="380" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="Lounge Musiq on Spotify"></iframe>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- About / Pillars -->
+    <!-- About -->
     <section class="section" id="about">
       <div class="wrap">
-        <div class="section-head reveal">
-          <div>
-            <p class="eyebrow">The Label</p>
-            <h2>Four pillars of the Lounge Musiq world</h2>
-          </div>
-        </div>
-        <div class="pillar-grid">
-          <article class="pillar-card reveal">
-            <span class="pillar-num">01</span>
+        <header class="section-header reveal">
+          <p class="label">The Label</p>
+          <h2>Lounge Musiq</h2>
+        </header>
+        <div class="grid grid--pillars">
+          <article class="pillar reveal">
+            <span class="pillar-n">01</span>
             <h3>Curated catalogue</h3>
             <p>Selected lounge and chillout productions with a consistent premium sound signature.</p>
           </article>
-          <article class="pillar-card reveal">
-            <span class="pillar-num">02</span>
+          <article class="pillar reveal">
+            <span class="pillar-n">02</span>
             <h3>Hotel-grade ambience</h3>
             <p>Warm, restrained soundscapes for terraces, lobbies and late-night calm.</p>
           </article>
-          <article class="pillar-card reveal">
-            <span class="pillar-num">03</span>
+          <article class="pillar reveal">
+            <span class="pillar-n">03</span>
             <h3>Visual identity</h3>
             <p>Luxury beach imagery, cinematic stillness and a label world built around atmosphere.</p>
           </article>
-          <article class="pillar-card reveal">
-            <span class="pillar-num">04</span>
+          <article class="pillar reveal">
+            <span class="pillar-n">04</span>
             <h3>Cinematic use</h3>
             <p>Music shaped for premium visuals, long-form ambience, storytelling and calm focus.</p>
           </article>
@@ -176,29 +174,30 @@
     </section>
 
     <!-- Statement -->
-    <section class="section section--alt" id="statement">
+    <section class="section section--statement">
       <div class="wrap">
-        <div class="statement-card reveal">
-          <p class="eyebrow">Label Statement</p>
-          <h2>A catalogue for elegant environments.</h2>
+        <div class="statement reveal">
+          <p class="label">Label Statement</p>
+          <h2>A catalogue for<br>elegant environments.</h2>
           <p>Lounge Musiq releases refined chillout, deep lounge and ambient music for sophisticated listening spaces — from sunset terraces and hotel lounges to premium creators and cinematic visuals.</p>
-          <div class="btn-row">
-            <a class="btn btn-primary" href="https://www.youtube.com/@loungemusiq?sub_confirmation=1" target="_blank" rel="noopener">Subscribe on YouTube</a>
-            <a class="btn btn-outline" href="https://open.spotify.com/artist/4Y6P3koTk32nA3QVJbLmsT" target="_blank" rel="noopener">Follow on Spotify</a>
+          <div class="hero-actions">
+            <a class="btn btn-glow" href="https://www.youtube.com/@loungemusiq?sub_confirmation=1" target="_blank" rel="noopener">Subscribe on YouTube</a>
+            <a class="btn btn-ghost" href="https://open.spotify.com/artist/4Y6P3koTk32nA3QVJbLmsT" target="_blank" rel="noopener">Follow on Spotify</a>
           </div>
         </div>
       </div>
     </section>
+
   </main>
 
   <footer class="footer">
-    <div class="wrap">
+    <div class="wrap footer-inner">
       <div class="footer-links">
         <a href="https://open.spotify.com/artist/4Y6P3koTk32nA3QVJbLmsT" target="_blank" rel="noopener">Spotify</a>
         <a href="https://www.youtube.com/@loungemusiq" target="_blank" rel="noopener">YouTube</a>
       </div>
-      <p class="footer-brand">Lounge Musiq — Premium Lounge Label</p>
-      <p class="footer-group">part of Z7 Music Group</p>
+      <p class="footer-brand">Lounge Musiq</p>
+      <p class="footer-sub">part of Z7 Music Group</p>
       <p class="footer-copy">&copy; <span id="year"></span> Lounge Musiq. All rights reserved.</p>
     </div>
   </footer>
