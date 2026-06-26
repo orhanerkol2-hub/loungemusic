@@ -114,7 +114,7 @@ h1, h2, h3 {
   position: absolute;
   inset: 0;
   z-index: -2;
-  background: url("92086bf6-273b-41f1-a9d3-061c01c8accc.png") center / cover no-repeat;
+  background: url("file_000000001de4720a9fe51b4c4fddbc10.png") center / cover no-repeat;
   transform: scale(1.06);
   will-change: transform;
   filter: saturate(0.85) brightness(0.7);
