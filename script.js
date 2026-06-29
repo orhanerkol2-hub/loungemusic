@@ -5,8 +5,12 @@ const CHANNEL = {
   url: 'https://www.youtube.com/@loungemusiq',
   videosUrl: 'https://www.youtube.com/@loungemusiq/videos',
   channelId: '',
-  uploadsPlaylistId: '',
-  maxVideos: 6
+  maxVideos: 6,
+  fallbackVideos: [
+    { id: 'c3XNr_0GQKs', title: 'Lounge Musiq Session' },
+    { id: 'zYd0tP2RivE', title: 'Lounge Musiq Session' },
+    { id: 'tdKCGbM-cNo', title: 'Lounge Musiq Session' }
+  ]
 };
 
 const $ = (sel, scope = document) => scope.querySelector(sel);
@@ -59,10 +63,24 @@ function playVideo(videoId) {
   if (videoFeature) videoFeature.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
+function bindGrid() {
+  videoGrid.addEventListener('click', (e) => {
+    const card = e.target.closest('.video-card');
+    if (card && card.dataset.videoId) playVideo(card.dataset.videoId);
+  });
+  videoGrid.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      const card = e.target.closest('.video-card');
+      if (card && card.dataset.videoId) { e.preventDefault(); playVideo(card.dataset.videoId); }
+    }
+  });
+}
+
 function proxied(url) {
   return [
     `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-    `https://corsproxy.io/?url=${encodeURIComponent(url)}`
+    `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
   ];
 }
 
@@ -94,71 +112,51 @@ async function resolveChannelId() {
   return '';
 }
 
+function renderVideoCards(videos, firstId) {
+  const cards = videos.map((v) => `
+    <div class="video-card reveal is-visible${v.id === firstId ? ' is-playing' : ''}" data-video-id="${v.id}" role="button" tabindex="0" aria-label="Play ${esc(v.title)}">
+      <div class="video-thumb">
+        <img src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg" alt="${esc(v.title)}" loading="lazy" />
+        <span class="play-sm" aria-hidden="true">&#9654;</span>
+      </div>
+      <div class="video-meta">
+        <h3>${esc(v.title)}</h3>
+        ${v.date ? `<p class="date">${fmtDate(v.date)}</p>` : ''}
+      </div>
+    </div>`).join('');
+
+  videoGrid.innerHTML = cards;
+  bindGrid();
+}
+
 function renderVideos(xmlText) {
   const xml = new DOMParser().parseFromString(xmlText, 'text/xml');
   const entries = Array.from(xml.getElementsByTagName('entry')).slice(0, CHANNEL.maxVideos);
   if (!entries.length) throw new Error('No videos found');
 
-  const firstIdNode = entries[0].getElementsByTagName('yt:videoId')[0] || entries[0].getElementsByTagName('videoId')[0];
-  const firstId = firstIdNode ? firstIdNode.textContent : '';
-  if (firstId) embedVideo(firstId);
-
-  const cards = entries.map((entry) => {
+  const videos = entries.map((entry) => {
     const idNode = entry.getElementsByTagName('yt:videoId')[0] || entry.getElementsByTagName('videoId')[0];
     const titleNode = entry.getElementsByTagName('title')[0];
     const pubNode = entry.getElementsByTagName('published')[0];
-    const id = idNode ? idNode.textContent : '';
-    const title = titleNode ? titleNode.textContent : 'Lounge Musiq Session';
-    const published = pubNode ? pubNode.textContent : '';
-    if (!id) return '';
+    return {
+      id: idNode ? idNode.textContent : '',
+      title: titleNode ? titleNode.textContent : 'Lounge Musiq Session',
+      date: pubNode ? pubNode.textContent : ''
+    };
+  }).filter((v) => v.id);
 
-    return `
-      <div class="video-card reveal is-visible${id === firstId ? ' is-playing' : ''}" data-video-id="${id}" role="button" tabindex="0" aria-label="Play ${esc(title)}">
-        <div class="video-thumb">
-          <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="${esc(title)}" loading="lazy" />
-          <span class="play-sm" aria-hidden="true">&#9654;</span>
-        </div>
-        <div class="video-meta">
-          <h3>${esc(title)}</h3>
-          <p class="date">${fmtDate(published)}</p>
-        </div>
-      </div>`;
-  }).join('');
+  if (!videos.length) throw new Error('No valid videos');
 
-  videoGrid.innerHTML = cards;
-
-  videoGrid.addEventListener('click', (e) => {
-    const card = e.target.closest('.video-card');
-    if (card && card.dataset.videoId) playVideo(card.dataset.videoId);
-  });
-  videoGrid.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      const card = e.target.closest('.video-card');
-      if (card && card.dataset.videoId) { e.preventDefault(); playVideo(card.dataset.videoId); }
-    }
-  });
+  embedVideo(videos[0].id);
+  renderVideoCards(videos, videos[0].id);
 }
 
 function renderFallback() {
-  if (CHANNEL.uploadsPlaylistId) {
-    videoIntro.hidden = true;
-    videoEmbed.hidden = false;
-    videoEmbed.innerHTML = `<iframe src="https://www.youtube.com/embed/videoseries?list=${CHANNEL.uploadsPlaylistId}&rel=0&modestbranding=1" title="Lounge Musiq uploads" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-  }
+  const videos = CHANNEL.fallbackVideos;
+  if (!videos.length) return;
 
-  videoGrid.innerHTML = `
-    <a class="video-card" href="${CHANNEL.videosUrl}" target="_blank" rel="noopener">
-      <div class="video-meta">
-        <h3>Watch the latest Lounge Musiq visuals</h3>
-        <p class="date">Premium lounge visuals, sunset ambience and deep chill sessions.</p>
-      </div>
-    </a>
-    <a class="video-card" href="${CHANNEL.url}" target="_blank" rel="noopener">
-      <div class="video-meta">
-        <h3>Subscribe to the label channel</h3>
-        <p class="date">Lounge Musiq — Premium Lounge Label</p>
-      </div>
-    </a>`;
+  embedVideo(videos[0].id);
+  renderVideoCards(videos, videos[0].id);
 }
 
 async function loadVideos() {
@@ -170,7 +168,7 @@ async function loadVideos() {
     if (!xmlText || !xmlText.includes('<entry')) throw new Error('Feed unavailable');
     renderVideos(xmlText);
   } catch (err) {
-    console.warn('Video load fallback:', err);
+    console.warn('Using fallback videos:', err.message);
     renderFallback();
   }
 }
