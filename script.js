@@ -4,7 +4,7 @@ const CHANNEL = {
   handle: '@loungemusiq',
   url: 'https://www.youtube.com/@loungemusiq',
   videosUrl: 'https://www.youtube.com/@loungemusiq/videos',
-  channelId: '',
+  channelId: 'UCp-SzyWEpfsc6rZwG5LDEOw',
   maxVideos: 6,
   fallbackVideos: [
     { id: 'c3XNr_0GQKs', title: 'Lounge Musiq Session' },
